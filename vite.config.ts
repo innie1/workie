@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  base: './',
   plugins: [
     react(),
     VitePWA({
@@ -17,12 +18,12 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'any',
         icons: [
-          { src: '/favicon.svg', sizes: '64x64', type: 'image/svg+xml', purpose: 'any' },
-          { src: '/favicon.svg', sizes: '64x64', type: 'image/svg+xml', purpose: 'maskable' }
+          { src: './favicon.svg', sizes: '64x64', type: 'image/svg+xml', purpose: 'any' },
+          { src: './favicon.svg', sizes: '64x64', type: 'image/svg+xml', purpose: 'maskable' }
         ]
       },
       workbox: {
-        navigateFallback: '/index.html',
+        navigateFallback: 'index.html',
         globPatterns: ['**/*.{js,css,html,svg,ico}']
       }
     })
