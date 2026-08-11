@@ -1,109 +1,28 @@
-import { useMemo, useState } from 'react'
-import {
-  Activity, ArrowRight, Bell, Bot, ChevronDown, FileText, Folder, Grid2X2,
-  HelpCircle, Image, LayoutTemplate, Menu, MoreHorizontal, Moon, Music2,
-  Palette, PlaySquare, Plus, Search, Settings, Sheet, Sparkles, Trash2,
-  Upload, Video, X, Zap,
-} from 'lucide-react'
+import { useState } from 'react'
+import { Activity, ArrowRight, Bot, FileText, Folder, Grid2X2, Image, LayoutTemplate, Menu, Music2, Palette, PlaySquare, Plus, Search, Settings, Sheet, Sparkles, Trash2, Upload, Video, X } from 'lucide-react'
+import { askWorkieAI } from './workie-ai'
+import './styles.css'
 
-type Tool = { name: string; subtitle: string; icon: typeof FileText; tone: string }
-
-const tools: Tool[] = [
-  { name: 'Docs', subtitle: 'Write', icon: FileText, tone: 'blue' },
-  { name: 'Sheets', subtitle: 'Calculate', icon: Sheet, tone: 'green' },
-  { name: 'Slides', subtitle: 'Present', icon: LayoutTemplate, tone: 'orange' },
-  { name: 'Design', subtitle: 'Create', icon: Palette, tone: 'purple' },
-  { name: 'Motion Studio', subtitle: 'Animate', icon: PlaySquare, tone: 'violet' },
-  { name: 'Video', subtitle: 'Edit', icon: Video, tone: 'pink' },
-  { name: 'Images', subtitle: 'Create', icon: Image, tone: 'indigo' },
-  { name: 'Audio', subtitle: 'Sound', icon: Music2, tone: 'teal' },
-]
-
-const files = [
-  { name: 'Business Proposal.docx', type: 'Docs', icon: FileText, time: '2 min ago', tone: 'blue' },
-  { name: 'Sales Dashboard.xlsx', type: 'Sheets', icon: Sheet, time: '1 hr ago', tone: 'green' },
-  { name: 'Marketing Strategy.pptx', type: 'Slides', icon: LayoutTemplate, time: '3 hrs ago', tone: 'orange' },
-  { name: 'Product Launch.moti', type: 'Motion Studio', icon: PlaySquare, time: 'Yesterday', tone: 'violet' },
-  { name: 'Brand Assets.png', type: 'Images', icon: Image, time: '2 days ago', tone: 'indigo' },
-]
-
-function App() {
-  const [active, setActive] = useState('Home')
-  const [query, setQuery] = useState('')
-  const [showCreate, setShowCreate] = useState(false)
-  const [showAi, setShowAi] = useState(false)
-  const [aiText, setAiText] = useState('')
-  const [notice, setNotice] = useState('')
-
-  const filteredFiles = useMemo(
-    () => files.filter((file) => `${file.name} ${file.type}`.toLowerCase().includes(query.toLowerCase())),
-    [query],
-  )
-
-  const openTool = (name: string) => {
-    setActive(name)
-    setNotice(`${name} workspace is ready to build.`)
-    window.setTimeout(() => setNotice(''), 2200)
-  }
-
-  const askAi = (prompt = aiText) => {
-    if (!prompt.trim()) return
-    setNotice(`Workie AI received: “${prompt.trim()}”`)
-    setAiText('')
-    setShowAi(true)
-    window.setTimeout(() => setNotice(''), 2800)
-  }
-
-  return (
-    <div className="app-shell">
-      <aside className="sidebar">
-        <div className="brand"><span className="brand-mark">W</span><span>Workie</span></div>
-        <nav className="nav">
-          {['Home', 'Docs', 'Sheets', 'Slides', 'Design', 'Motion Studio', 'Video', 'Images', 'Audio', 'PDF Tools', 'Notes', 'Files', 'Browser', 'Apps'].map((item) => {
-            const Icon = item === 'Home' ? Grid2X2 : item === 'Files' ? Folder : item === 'Apps' ? Grid2X2 : item === 'Motion Studio' ? PlaySquare : item === 'Video' ? Video : item === 'Images' ? Image : item === 'Audio' ? Music2 : item === 'Design' ? Palette : item === 'Notes' ? FileText : item === 'PDF Tools' ? FileText : item === 'Browser' ? Search : FileText
-            return <button key={item} className={`nav-item ${active === item ? 'active' : ''}`} onClick={() => openTool(item)}><Icon size={18} strokeWidth={1.9} /><span>{item}</span></button>
-          })}
-        </nav>
-        <div className="sidebar-bottom">
-          <button className="nav-item" onClick={() => setNotice('Templates are coming into the workspace.') }><LayoutTemplate size={18}/><span>Templates</span></button>
-          <button className="nav-item" onClick={() => setNotice('Trash is empty.') }><Trash2 size={18}/><span>Trash</span></button>
-          <button className="nav-item" onClick={() => setNotice('Settings are ready.') }><Settings size={18}/><span>Settings</span></button>
-          <div className="storage"><div><span>Storage</span><b>12%</b></div><div className="progress"><span /></div><small>19 GB / 160 GB</small></div>
-        </div>
-      </aside>
-
-      <main className="main">
-        <header className="topbar">
-          <button className="mobile-menu"><Menu size={20}/></button>
-          <div className="search"><Search size={18}/><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search files, tools, templates..."/><kbd>Ctrl K</kbd></div>
-          <div className="top-actions"><button aria-label="Theme"><Moon size={19}/></button><button aria-label="Notifications"><Bell size={19}/><i>3</i></button><button aria-label="Help"><HelpCircle size={19}/></button><div className="avatar">W</div><ChevronDown size={15}/></div>
-        </header>
-
-        <div className="content">
-          <section className="hero">
-            <div><p className="eyebrow">YOUR WORKSPACE</p><h1>Good morning 👋</h1><p className="muted">What would you like to create today?</p></div>
-            <div className="hero-actions"><button className="primary" onClick={() => setShowCreate(true)}><Plus size={18}/> Create New</button><button onClick={() => setNotice('File picker will open in the next build.') }><Upload size={17}/> Open File</button><button onClick={() => setShowAi(true)}><Sparkles size={17}/> AI Assistant</button></div>
-          </section>
-
-          <section className="tool-grid">{tools.map(({ name, subtitle, icon: Icon, tone }) => <button className="tool-card" key={name} onClick={() => openTool(name)}><span className={`tool-icon ${tone}`}><Icon size={21}/></span><strong>{name}</strong><small>{subtitle}</small></button>)}<button className="tool-card" onClick={() => setNotice('More Workie tools will appear here.')}><span className="tool-icon neutral"><MoreHorizontal size={21}/></span><strong>More</strong><small>Explore</small></button></section>
-
-          <section className="dashboard-grid">
-            <div className="panel recent"><div className="panel-head"><h2>Recent Files</h2><button>View all</button></div>{filteredFiles.map(({ name, type, icon: Icon, time, tone }) => <button className="file-row" key={name} onClick={() => openTool(type)}><span className={`file-icon ${tone}`}><Icon size={17}/></span><span className="file-meta"><strong>{name}</strong><small>{type}</small></span><time>{time}</time><MoreHorizontal size={17}/></button>)}{filteredFiles.length === 0 && <div className="empty">No matching files.</div>}</div>
-            <div className="panel quick"><div className="panel-head"><h2>Quick Start</h2></div>{[['Blank Document', 'Start writing', FileText], ['New Spreadsheet', 'Start with data', Sheet], ['New Presentation', 'Start a deck', LayoutTemplate], ['New Motion Project', 'Create animation', PlaySquare], ['Import File', 'Upload from device', Upload]].map(([name, sub, Icon]) => <button className="quick-row" key={String(name)} onClick={() => setNotice(`${name} selected.`)}><span><Icon size={18}/></span><div><strong>{name}</strong><small>{sub}</small></div><ArrowRight size={17}/></button>)}</div>
-          </section>
-
-          <section className="lower-grid">
-            <div className="panel templates"><div className="panel-head"><h2>Templates</h2><button>View all</button></div><div className="template-grid">{['Project Proposal','Marketing Plan','Business Report','Pitch Deck','Invoice','Social Post'].map((name, i) => <button key={name} onClick={() => setNotice(`${name} template selected.`)}><div className={`template-preview p${i}`}><div/><span/><span/></div><strong>{name}</strong></button>)}</div></div>
-            <div className="right-stack"><div className="panel ai-card"><div className="ai-head"><span className="ai-symbol"><Sparkles size={20}/></span><div><h2>Workie AI</h2><small>Your workspace assistant</small></div><span className="model">Gemma 4</span></div><div className="ai-input"><textarea value={aiText} onChange={(e) => setAiText(e.target.value)} placeholder="Ask Workie to create, edit, analyze or organize..."/><button onClick={() => askAi()}><ArrowRight size={18}/></button></div><div className="chips"><button onClick={() => askAi('Create a presentation')}>Create a presentation</button><button onClick={() => askAi('Analyze this document')}>Analyze a document</button><button onClick={() => askAi('Create a motion graphic')}>Create motion graphic</button></div></div><div className="panel motion-card"><div className="panel-head"><h2>Motion Studio</h2><button onClick={() => openTool('Motion Studio')}>New Project</button></div><button className="motion-preview" onClick={() => openTool('Motion Studio')}><div className="wave"><span/><span/><span/><span/><span/></div><span className="play"><Zap size={20} fill="currentColor"/></span><time>00:45</time></button><strong>Brand Intro Animation</strong><small>Edited 2 hours ago</small></div></div>
-          </section>
-        </div>
-      </main>
-
-      {showCreate && <div className="modal-backdrop" onMouseDown={() => setShowCreate(false)}><div className="modal" onMouseDown={(e) => e.stopPropagation()}><div className="modal-head"><div><p className="eyebrow">CREATE</p><h2>Start something new</h2></div><button onClick={() => setShowCreate(false)}><X/></button></div><div className="create-grid">{tools.slice(0, 7).map(({ name, icon: Icon, tone }) => <button key={name} onClick={() => { setShowCreate(false); openTool(name) }}><span className={`tool-icon ${tone}`}><Icon size={22}/></span><strong>{name}</strong></button>)}</div></div></div>}
-      {showAi && <button className="ai-fab" onClick={() => setShowAi(false)}><Bot size={19}/> Workie AI</button>}
-      {notice && <div className="toast"><Activity size={17}/>{notice}</div>}
-    </div>
-  )
+type Tool={name:string;subtitle:string;icon:any;tone:string}
+const tools:Tool[]=[
+{name:'Docs',subtitle:'Write',icon:FileText,tone:'blue'},{name:'Sheets',subtitle:'Calculate',icon:Sheet,tone:'green'},{name:'Slides',subtitle:'Present',icon:LayoutTemplate,tone:'orange'},{name:'Design',subtitle:'Create',icon:Palette,tone:'purple'},{name:'Motion Studio',subtitle:'Animate',icon:PlaySquare,tone:'violet'},{name:'Video',subtitle:'Edit',icon:Video,tone:'pink'},{name:'Images',subtitle:'Create',icon:Image,tone:'indigo'},{name:'Audio',subtitle:'Sound',icon:Music2,tone:'teal'}]
+const nav=['Home',...tools.map(t=>t.name),'PDF Tools','Notes','Files','Browser','Apps']
+function App(){
+ const[active,setActive]=useState('Home'),[query,setQuery]=useState(''),[create,setCreate]=useState(false),[ai,setAi]=useState(false),[prompt,setPrompt]=useState(''),[answer,setAnswer]=useState(''),[busy,setBusy]=useState(false),[notice,setNotice]=useState('')
+ const go=(name:string)=>{setActive(name);setNotice(`${name} workspace is ready.`);setTimeout(()=>setNotice(''),1800)}
+ const ask=async(text=prompt)=>{if(!text.trim()||busy)return;setBusy(true);setAnswer('');try{setAnswer((await askWorkieAI({prompt:text})).text)}catch(e){setAnswer(e instanceof Error?e.message:'Gemma could not respond.')}finally{setBusy(false)}}
+ const iconFor=(name:string)=>name==='Home'?Grid2X2:name==='Files'?Folder:name==='Apps'?Grid2X2:tools.find(t=>t.name===name)?.icon||FileText
+ return <div className="app-shell">
+  <aside className="sidebar"><div className="brand"><span className="brand-mark">W</span><span>Workie</span></div><nav className="nav">{nav.map(name=>{const Icon=iconFor(name);return <button key={name} className={`nav-item ${active===name?'active':''}`} onClick={()=>go(name)}><Icon size={18}/><span>{name}</span></button>})}</nav><div className="sidebar-bottom"><button className="nav-item"><Trash2 size={18}/><span>Trash</span></button><button className="nav-item"><Settings size={18}/><span>Settings</span></button><div className="storage"><div><span>Storage</span><b>12%</b></div><div className="progress"><span/></div><small>19 GB / 160 GB</small></div></div></aside>
+  <main className="main"><header className="topbar"><button className="mobile-menu"><Menu size={20}/></button><div className="search"><Search size={18}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search files, tools, templates..."/><kbd>Ctrl K</kbd></div><div className="top-actions"><div className="avatar">W</div></div></header>
+   <div className="content">{active==='Home'?<>
+    <section className="hero"><div><p className="eyebrow">YOUR WORKSPACE</p><h1>Good morning 👋</h1><p className="muted">What would you like to create today?</p></div><div className="hero-actions"><button className="primary" onClick={()=>setCreate(true)}><Plus size={18}/> Create New</button><button onClick={()=>setNotice('File picker coming next.') }><Upload size={17}/> Open File</button><button onClick={()=>setAi(true)}><Sparkles size={17}/> AI Assistant</button></div></section>
+    <section className="tool-grid">{tools.map(t=>{const Icon=t.icon;return <button className="tool-card" key={t.name} onClick={()=>go(t.name)}><span className={`tool-icon ${t.tone}`}><Icon size={21}/></span><strong>{t.name}</strong><small>{t.subtitle}</small></button>})}</section>
+    <section className="dashboard-grid"><div className="panel recent"><div className="panel-head"><h2>Recent Files</h2><button>View all</button></div>{['Business Proposal.docx','Sales Dashboard.xlsx','Marketing Strategy.pptx','Brand Intro.moti'].filter(x=>x.toLowerCase().includes(query.toLowerCase())).map((name,i)=><button className="file-row" key={name} onClick={()=>go(tools[i%tools.length].name)}><span className={`file-icon ${tools[i%tools.length].tone}`}><FileText size={17}/></span><span className="file-meta"><strong>{name}</strong><small>{tools[i%tools.length].name}</small></span><time>{i+1} hr ago</time></button>)}</div><div className="panel quick"><div className="panel-head"><h2>Quick Start</h2></div>{[['Blank Document','Docs',FileText],['New Spreadsheet','Sheets',Sheet],['New Presentation','Slides',LayoutTemplate],['New Motion Project','Motion Studio',PlaySquare]].map(([name,target,Icon]:any)=><button className="quick-row" key={name} onClick={()=>go(target)}><span><Icon size={18}/></span><div><strong>{name}</strong><small>Start creating</small></div><ArrowRight size={17}/></button>)}</div></section>
+    <section className="lower-grid"><div className="panel templates"><div className="panel-head"><h2>Templates</h2><button>View all</button></div><div className="template-grid">{['Project Proposal','Marketing Plan','Business Report','Pitch Deck','Invoice','Social Post'].map((x,i)=><button key={x} onClick={()=>setNotice(`${x} selected.`)}><div className={`template-preview p${i}`}><div/><span/><span/></div><strong>{x}</strong></button>)}</div></div><div className="right-stack"><div className="panel ai-card"><div className="ai-head"><span className="ai-symbol"><Sparkles size={20}/></span><div><h2>Workie AI</h2><small>Powered by Gemma 4</small></div><span className="model">Gemma 4</span></div><div className="ai-input"><textarea value={prompt} onChange={e=>setPrompt(e.target.value)} placeholder="Ask Workie to create, edit, analyze or organize..."/><button onClick={()=>ask()} disabled={busy}><ArrowRight size={18}/></button></div>{answer&&<div className="empty"><strong>{busy?'Thinking…':'Workie AI'}</strong><p>{answer}</p></div>}<div className="chips"><button onClick={()=>ask('Create a presentation')}>Create a presentation</button><button onClick={()=>ask('Create a motion graphic')}>Create motion graphic</button></div></div><div className="panel motion-card"><div className="panel-head"><h2>Motion Studio</h2><button onClick={()=>go('Motion Studio')}>New Project</button></div><button className="motion-preview" onClick={()=>go('Motion Studio')}><span className="play">▶</span></button><strong>Brand Intro Animation</strong><small>Motion graphics workspace</small></div></div></section>
+   </>:<section className="tool-page"><div className="tool-page-icon">{(() => {const I=iconFor(active);return <I size={28}/>})()}</div><h2>{active}</h2><p>{tools.find(t=>t.name===active)?.subtitle||'Your Workie workspace.'}</p><button className="primary" onClick={()=>setNotice(`New ${active} project created.`)}>Create new</button></section>}</div></main>
+  {create&&<div className="modal-backdrop" onMouseDown={()=>setCreate(false)}><div className="modal" onMouseDown={e=>e.stopPropagation()}><div className="modal-head"><div><p className="eyebrow">CREATE</p><h2>Start something new</h2></div><button onClick={()=>setCreate(false)}><X/></button></div><div className="create-grid">{tools.map(t=>{const I=t.icon;return <button key={t.name} onClick={()=>{setCreate(false);go(t.name)}}><span className={`tool-icon ${t.tone}`}><I size={22}/></span><strong>{t.name}</strong></button>})}</div></div></div>}
+  {ai&&<button className="ai-fab" onClick={()=>{setAi(false);window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})}}><Bot size={19}/> Workie AI</button>}{notice&&<div className="toast"><Activity size={17}/>{notice}</div>}
+ </div>
 }
-
 export default App
