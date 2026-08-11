@@ -17,14 +17,13 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'any',
         icons: [
-          { src: '/pwa-192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/pwa-512.png', sizes: '512x512', type: 'image/png' },
-          { src: '/pwa-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+          { src: '/favicon.svg', sizes: '64x64', type: 'image/svg+xml', purpose: 'any' },
+          { src: '/favicon.svg', sizes: '64x64', type: 'image/svg+xml', purpose: 'maskable' }
         ]
       },
       workbox: {
         navigateFallback: '/index.html',
-        globPatterns: ['**/*.{js,css,html,svg,png,ico}']
+        globPatterns: ['**/*.{js,css,html,svg,ico}']
       }
     })
   ]
