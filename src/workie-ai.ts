@@ -1,5 +1,4 @@
 import { Wllama } from '@wllama/wllama'
-import WasmFromCDN from '@wllama/wllama/esm/wasm-from-cdn.js'
 
 export type WorkieAIProvider = 'local-gemma' | 'openrouter' | 'remote-gemma'
 export type WorkieAIRequest = { prompt: string; context?: string }
@@ -12,6 +11,7 @@ let status: Status = { ready: false, loading: false, progress: 0 }
 
 const MODEL = { repo: 'reeselevine/wllama-split-models', file: 'gemma-4-E2B-it-Q4_0-00001-of-00005.gguf' }
 const OPENROUTER_KEY_STORAGE = 'workie.openrouter.key'
+const WASM_CONFIG = { default: 'https://unpkg.com/@wllama/wllama@3.5.1/esm/wasm/wllama.wasm' }
 
 export function getGemmaStatus(): Status { return { ...status } }
 export function hasOpenRouterKey() { return Boolean(localStorage.getItem(OPENROUTER_KEY_STORAGE)) }
@@ -23,7 +23,7 @@ export async function loadLocalGemma(onProgress?: (percent: number) => void) {
   if (loading) return loading
   status = { ready: false, loading: true, progress: 0 }
   loading = (async () => {
-    const wllama = new Wllama(WasmFromCDN as any)
+    const wllama = new Wllama(WASM_CONFIG)
     await wllama.loadModelFromHF(MODEL, { progressCallback: ({ loaded, total }: { loaded: number; total: number }) => {
       const percent = total ? Math.round((loaded / total) * 100) : 0
       status = { ready: false, loading: true, progress: percent }
