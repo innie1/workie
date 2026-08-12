@@ -23,6 +23,8 @@ export async function loadLocalGemma(onProgress?: (percent: number) => void) {
   if (loading) return loading
   status = { ready: false, loading: true, progress: 0 }
   loading = (async () => {
+    // Wllama v3 expects a path configuration object. Keep the WASM runtime external
+    // so the PWA bundle stays small; the model itself is downloaded only on request.
     const wllama = new Wllama(WASM_CONFIG)
     await wllama.loadModelFromHF(MODEL, { progressCallback: ({ loaded, total }: { loaded: number; total: number }) => {
       const percent = total ? Math.round((loaded / total) * 100) : 0
