@@ -3,9 +3,8 @@ import { Download, FileText, Image as ImageIcon, Music2, Play, Plus, Save, Spark
 import { createDocument, deleteDocument, listDocuments, saveDocument, type WorkieDocument } from './document-store'
 
 type WorkspaceProps = { kind: string; onNotice: (message: string) => void }
-type Row = string[]
+type Row = any
 const PROJECTS = 'workie-projects-v2'
-
 function readProjects(): Record<string, any> { try { return JSON.parse(localStorage.getItem(PROJECTS) || '{}') } catch { return {} } }
 function writeProjects(value: Record<string, any>) { localStorage.setItem(PROJECTS, JSON.stringify(value)) }
 function download(name: string, data: string, type: string) { const a = document.createElement('a'); const url = URL.createObjectURL(new Blob([data], { type })); a.href = url; a.download = name; a.click(); URL.revokeObjectURL(url) }
@@ -23,16 +22,16 @@ function Docs({ onNotice }: { onNotice: (message: string) => void }) {
 
 function Sheets({ onNotice }: { onNotice: (message: string) => void }) {
   const [rows,setRows]=useState<Row[][]>(()=>{try{return JSON.parse(readProjects().sheet?.rows||'null')||[['Item','Quantity','Price','Total'],['','','','=B2*C2'],['','','','=B3*C3'],['','','','=B4*C4']]}catch{return [['Item','Quantity','Price','Total']]}})
-  const update=(r:number,c:number,v:string)=>setRows(x=>x.map((row,ri)=>ri===r?row.map((cell,ci)=>ci===c?v:cell):row))
-  const add=()=>setRows(x=>[...x,Array(4).fill('')])
+  const update=(r:number,c:number,v:string)=>setRows(x=>x.map((row,ri)=>ri===r?row.map((cell:any,ci:number)=>ci===c?v:cell):row))
+  const add=()=>setRows(x=>[...x, ['', '', '', '']])
   const total=useMemo(()=>rows.slice(1).reduce((n,r)=>n+(Number(r[1])||0)*(Number(r[2])||0),0),[rows])
   const save=()=>{writeProjects({...readProjects(),sheet:{rows:JSON.stringify(rows)}});onNotice('Spreadsheet saved.')}
-  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n')
-  return <div className="sheet-shell"><div className="editor-toolbar"><div><strong>Untitled Spreadsheet</strong><small> Local workbook</small></div><div className="editor-actions"><span className="sheet-total">Total: {total.toLocaleString()}</span><button onClick={add}><Plus size={16}/> Row</button><button onClick={save}><Save size={16}/> Save</button><button onClick={()=>download('workie-sheet.csv',csv,'text/csv')}><Download size={16}/> CSV</button></div></div><div className="sheet-wrap"><table><tbody>{rows.map((row,r)=><tr key={r}><th>{r+1}</th>{row.map((v,c)=><td key={c}><input value={v} onChange={e=>update(r,c,e.target.value)} /></td>)}</tr>)}</tbody></table></div></div>
+  const csv=rows.map(r=>r.map((v:any)=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n')
+  return <div className="sheet-shell"><div className="editor-toolbar"><div><strong>Untitled Spreadsheet</strong><small> Local workbook</small></div><div className="editor-actions"><span className="sheet-total">Total: {total.toLocaleString()}</span><button onClick={add}><Plus size={16}/> Row</button><button onClick={save}><Save size={16}/> Save</button><button onClick={()=>download('workie-sheet.csv',csv,'text/csv')}><Download size={16}/> CSV</button></div></div><div className="sheet-wrap"><table><tbody>{rows.map((row:any[],r:number)=><tr key={r}><th>{r+1}</th>{row.map((v:any,c:number)=><td key={c}><input value={v} onChange={e=>update(r,c,e.target.value)} /></td>)}</tr>)}</tbody></table></div></div>
 }
 
 function Slides({ onNotice }: { onNotice: (message: string) => void }) {
-  const [slides,setSlides]=useState(()=>readProjects().slides?.slides||[{title:'Untitled Presentation',body:'Add your content here.'}]),[active,setActive]=useState(0)
+  const [slides,setSlides]=useState<any[]>(()=>readProjects().slides?.slides||[{title:'Untitled Presentation',body:'Add your content here.'}]),[active,setActive]=useState(0)
   const current=slides[active]||slides[0]
   const update=(key:'title'|'body',value:string)=>setSlides((s:any[])=>s.map((x,i)=>i===active?{...x,[key]:value}:x))
   const add=()=>{setSlides((s:any[])=>[...s,{title:`Slide ${s.length+1}`,body:'Add your content here.'}]);setActive(slides.length)}
