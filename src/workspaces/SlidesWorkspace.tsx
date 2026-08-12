@@ -25,7 +25,7 @@ export function SlidesWorkspace({ activeProjectId, onNotice }: Props) {
   const [current, setCurrent] = useState<WorkieProject<SlideData> | null>(null)
   const [slides, setSlides] = useState<SlideItem[]>([])
   const [activeSlideIndex, setActiveSlideIndex] = useState(0)
-  const [name, setName] = useState('Presentation Deck')
+  const [name, setName] = useState('Untitled Presentation')
   const [isPresenting, setIsPresenting] = useState(false)
   const [presentIndex, setPresentIndex] = useState(0)
 
@@ -40,6 +40,11 @@ export function SlidesWorkspace({ activeProjectId, onNotice }: Props) {
         setSlides(loadedSlides)
         setActiveSlideIndex(0)
       }
+    } else {
+      setCurrent(null)
+      setName('Untitled Presentation')
+      setSlides([])
+      setActiveSlideIndex(0)
     }
   }, [decks, activeProjectId])
 
@@ -47,16 +52,16 @@ export function SlidesWorkspace({ activeProjectId, onNotice }: Props) {
 
   const handleCreateNew = async () => {
     const initialSlides: SlideItem[] = [
-      { id: crypto.randomUUID(), title: 'Presentation Title', body: '• Subtitle or Key Takeaway\n• Author Name\n• Date', layout: 'headline' },
-      { id: crypto.randomUUID(), title: 'Agenda & Vision', body: '• Market Analysis\n• Strategic Pillars\n• Growth Milestones', layout: 'standard' },
+      { id: crypto.randomUUID(), title: '', body: '', layout: 'standard' },
     ]
-    const p = await createProject('presentation', 'New Presentation', { slides: initialSlides })
+    const p = await createProject('presentation', 'Untitled Presentation', { slides: initialSlides })
     setCurrent(p)
     setName(p.name)
     setSlides(initialSlides)
     setActiveSlideIndex(0)
     onNotice('New presentation created.')
   }
+
 
   const updateSlide = (key: keyof SlideItem, val: string) => {
     if (!activeSlide) return

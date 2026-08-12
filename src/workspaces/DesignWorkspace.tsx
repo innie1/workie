@@ -31,8 +31,8 @@ interface Props {
 export function DesignWorkspace({ activeProjectId, onNotice }: Props) {
   const { projects: designs, reload } = useProjects('design')
   const [current, setCurrent] = useState<WorkieProject<DesignData> | null>(null)
-  const [title, setTitle] = useState('SPECIAL PROMOTION')
-  const [subtitle, setSubtitle] = useState('Limited time offer - Order today!')
+  const [title, setTitle] = useState('')
+  const [subtitle, setSubtitle] = useState('')
   const [size, setSize] = useState('1080 × 1080')
   const [bgColor, setBgColor] = useState('#7C3CFF')
   const [elements, setElements] = useState<DesignElement[]>([])
@@ -50,28 +50,33 @@ export function DesignWorkspace({ activeProjectId, onNotice }: Props) {
         setBgColor(selected.data?.bgColor || '#7C3CFF')
         setElements(selected.data?.elements || [])
       }
+    } else {
+      setCurrent(null)
+      setTitle('')
+      setSubtitle('')
+      setBgColor('#7C3CFF')
+      setElements([])
     }
   }, [designs, activeProjectId])
 
   const handleCreateNew = async () => {
     const defaultData: DesignData = {
-      title: 'SUMMER SALE 50% OFF',
-      subtitle: 'Premium products delivered to your door',
+      title: '',
+      subtitle: '',
       size: '1080 × 1080',
-      bgColor: '#6E2CFF',
-      elements: [
-        { id: crypto.randomUUID(), type: 'text', content: 'GRAND LAUNCH', x: 40, y: 40, width: 300, height: 40, color: '#FFFFFF', fontSize: 24 },
-      ],
+      bgColor: '#7C3CFF',
+      elements: [],
     }
-    const p = await createProject('design', 'New Design', defaultData)
+    const p = await createProject('design', 'Untitled Design', defaultData)
     setCurrent(p)
-    setTitle(defaultData.title)
-    setSubtitle(defaultData.subtitle)
-    setSize(defaultData.size)
-    setBgColor(defaultData.bgColor)
-    setElements(defaultData.elements || [])
+    setTitle('')
+    setSubtitle('')
+    setSize('1080 × 1080')
+    setBgColor('#7C3CFF')
+    setElements([])
     onNotice('New design created.')
   }
+
 
   const handleAddText = () => {
     const newEl: DesignElement = {

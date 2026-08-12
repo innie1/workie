@@ -90,14 +90,14 @@ function getRangeValues(startRef: string, endRef: string, grid: Grid): string[] 
 export function SheetsWorkspace({ activeProjectId, onNotice }: Props) {
   const { projects: sheets, reload } = useProjects('spreadsheet')
   const [current, setCurrent] = useState<WorkieProject<SheetData> | null>(null)
-  const [grid, setGrid] = useState<Grid>([
-    ['Category', 'Description', 'Q1 Sales', 'Q2 Sales'],
-    ['Hardware', 'Laptops & Monitors', '15000', '18000'],
-    ['Software', 'Cloud Subscriptions', '4500', '5200'],
-    ['Services', 'Consulting & Support', '8900', '9400'],
-    ['Total', '', '=SUM(C2:C4)', '=SUM(D2:D4)'],
-  ])
-  const [name, setName] = useState('Workbook')
+  const emptyGrid: Grid = [
+    ['', '', '', ''],
+    ['', '', '', ''],
+    ['', '', '', ''],
+    ['', '', '', ''],
+  ]
+  const [grid, setGrid] = useState<Grid>(emptyGrid)
+  const [name, setName] = useState('Untitled Spreadsheet')
   const [showChart, setShowChart] = useState(false)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -108,28 +108,23 @@ export function SheetsWorkspace({ activeProjectId, onNotice }: Props) {
       if (selected) {
         setCurrent(selected)
         setName(selected.name)
-        setGrid(selected.data?.rows || [
-          ['Category', 'Amount'],
-          ['Project A', '1200'],
-          ['Project B', '2500'],
-        ])
+        setGrid(selected.data?.rows || emptyGrid)
       }
+    } else {
+      setCurrent(null)
+      setName('Untitled Spreadsheet')
+      setGrid(emptyGrid)
     }
   }, [sheets, activeProjectId])
 
   const handleCreateNew = async () => {
-    const defaultGrid: Grid = [
-      ['Item', 'Quantity', 'Price', 'Total'],
-      ['Item 1', '10', '25', '=C2*B2'],
-      ['Item 2', '5', '40', '=C3*B3'],
-      ['Total', '', '', '=SUM(D2:D3)'],
-    ]
-    const p = await createProject('spreadsheet', 'New Spreadsheet', { rows: defaultGrid })
+    const p = await createProject('spreadsheet', 'Untitled Spreadsheet', { rows: emptyGrid })
     setCurrent(p)
     setName(p.name)
-    setGrid(defaultGrid)
+    setGrid(emptyGrid)
     onNotice('New spreadsheet created.')
   }
+
 
   const updateCell = (r: number, c: number, value: string) => {
     setGrid((prev) => prev.map((row, ri) => (ri === r ? row.map((cell, ci) => (ci === c ? value : cell)) : row)))

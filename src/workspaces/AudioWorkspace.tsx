@@ -25,12 +25,9 @@ interface Props {
 export function AudioWorkspace({ activeProjectId, onNotice }: Props) {
   const { projects: audioProjects, reload } = useProjects('audio')
   const [current, setCurrent] = useState<WorkieProject<AudioData> | null>(null)
-  const [name, setName] = useState('Audio Composition')
+  const [name, setName] = useState('Untitled Audio Project')
   const [playing, setPlaying] = useState(false)
-  const [tracks, setTracks] = useState<AudioTrack[]>([
-    { id: '1', name: 'AI Voiceover - Intro', type: 'voiceover', volume: 90, duration: 15 },
-    { id: '2', name: 'Background Music Track', type: 'music', volume: 45, duration: 30 },
-  ])
+  const [tracks, setTracks] = useState<AudioTrack[]>([])
 
   useEffect(() => {
     if (audioProjects.length > 0) {
@@ -41,19 +38,22 @@ export function AudioWorkspace({ activeProjectId, onNotice }: Props) {
         setName(selected.name)
         setTracks(selected.data?.tracks || [])
       }
+    } else {
+      setCurrent(null)
+      setName('Untitled Audio Project')
+      setTracks([])
     }
   }, [audioProjects, activeProjectId])
 
   const handleCreateNew = async () => {
-    const defaultTracks: AudioTrack[] = [
-      { id: crypto.randomUUID(), name: 'Main Vocal Track', type: 'voiceover', volume: 80, duration: 20 },
-    ]
-    const p = await createProject('audio', 'New Audio Project', { name: 'New Audio Project', tracks: defaultTracks })
+    const defaultTracks: AudioTrack[] = []
+    const p = await createProject('audio', 'Untitled Audio Project', { name: 'Untitled Audio Project', tracks: defaultTracks })
     setCurrent(p)
     setName(p.name)
     setTracks(defaultTracks)
     onNotice('New audio project created.')
   }
+
 
   const addTrack = (type: 'voiceover' | 'music' | 'sfx') => {
     const newTrack: AudioTrack = {

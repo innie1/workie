@@ -25,13 +25,9 @@ interface Props {
 export function VideoWorkspace({ activeProjectId, onNotice }: Props) {
   const { projects: videoProjects, reload } = useProjects('video')
   const [current, setCurrent] = useState<WorkieProject<VideoData> | null>(null)
-  const [name, setName] = useState('Video Project')
+  const [name, setName] = useState('Untitled Video Project')
   const [playing, setPlaying] = useState(false)
-  const [clips, setClips] = useState<VideoClip[]>([
-    { id: '1', name: 'Intro Text Banner', startTime: 0, duration: 4, type: 'text', text: 'Welcome to Workie Video' },
-    { id: '2', name: 'Main Scene Clip', startTime: 4, duration: 8, type: 'video' },
-    { id: '3', name: 'Fade Transition', startTime: 12, duration: 2, type: 'transition' },
-  ])
+  const [clips, setClips] = useState<VideoClip[]>([])
 
   useEffect(() => {
     if (videoProjects.length > 0) {
@@ -42,19 +38,22 @@ export function VideoWorkspace({ activeProjectId, onNotice }: Props) {
         setName(selected.name)
         setClips(selected.data?.clips || [])
       }
+    } else {
+      setCurrent(null)
+      setName('Untitled Video Project')
+      setClips([])
     }
   }, [videoProjects, activeProjectId])
 
   const handleCreateNew = async () => {
-    const defaultClips: VideoClip[] = [
-      { id: crypto.randomUUID(), name: 'Scene 1: Introduction', startTime: 0, duration: 5, type: 'text', text: 'Workie Product Demo' },
-    ]
-    const p = await createProject('video', 'New Video Project', { name: 'New Video Project', clips: defaultClips })
+    const defaultClips: VideoClip[] = []
+    const p = await createProject('video', 'Untitled Video Project', { name: 'Untitled Video Project', clips: defaultClips })
     setCurrent(p)
     setName(p.name)
     setClips(defaultClips)
     onNotice('New video project created.')
   }
+
 
   const addClip = (type: 'video' | 'text' | 'transition') => {
     const totalDuration = clips.reduce((sum, c) => sum + c.duration, 0)

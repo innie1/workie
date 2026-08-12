@@ -37,10 +37,10 @@ interface Props {
 export function MotionWorkspace({ activeProjectId, onNotice }: Props) {
   const { projects: motionProjects, reload } = useProjects('motion')
   const [current, setCurrent] = useState<WorkieProject<MotionData> | null>(null)
-  const [name, setName] = useState('Motion Graphic')
+  const [name, setName] = useState('Untitled Motion')
   const [duration, setDuration] = useState(10)
   const [playing, setPlaying] = useState(false)
-  const [text, setText] = useState('WORKIE ANIMATED AD')
+  const [text, setText] = useState('')
   const [playheadPercent, setPlayheadPercent] = useState(0)
 
   // Motion properties
@@ -50,11 +50,7 @@ export function MotionWorkspace({ activeProjectId, onNotice }: Props) {
   const [rotation, setRotation] = useState(0)
   const [opacity, setOpacity] = useState(1)
 
-  const [keyframes, setKeyframes] = useState<Keyframe[]>([
-    { timePercent: 0, x: 10, y: 50, scale: 0.5, rotation: -15, opacity: 0 },
-    { timePercent: 50, x: 50, y: 50, scale: 1.2, rotation: 0, opacity: 1 },
-    { timePercent: 100, x: 90, y: 50, scale: 1, rotation: 15, opacity: 0.8 },
-  ])
+  const [keyframes, setKeyframes] = useState<Keyframe[]>([])
 
   const animFrameRef = useRef<number | null>(null)
   const startTimeRef = useRef<number | null>(null)
@@ -67,13 +63,19 @@ export function MotionWorkspace({ activeProjectId, onNotice }: Props) {
         setCurrent(selected)
         setName(selected.name)
         setDuration(selected.data?.duration || 10)
-        setText(selected.data?.text || 'WORKIE MOTION')
-        if (selected.data?.keyframes && selected.data.keyframes.length > 0) {
+        setText(selected.data?.text || '')
+        if (selected.data?.keyframes) {
           setKeyframes(selected.data.keyframes)
         }
       }
+    } else {
+      setCurrent(null)
+      setName('Untitled Motion')
+      setText('')
+      setKeyframes([])
     }
   }, [motionProjects, activeProjectId])
+
 
   // Animation Loop engine
   useEffect(() => {
@@ -152,23 +154,20 @@ export function MotionWorkspace({ activeProjectId, onNotice }: Props) {
   const handleCreateNew = async () => {
     const defaultData: MotionData = {
       duration: 10,
-      text: 'SPRING SALE ADVERT',
-      x: 20,
-      frames: [0, 50, 100],
-      keyframes: [
-        { timePercent: 0, x: 20, y: 50, scale: 0.6, rotation: -10, opacity: 0.2 },
-        { timePercent: 50, x: 50, y: 40, scale: 1.3, rotation: 0, opacity: 1 },
-        { timePercent: 100, x: 80, y: 50, scale: 0.9, rotation: 10, opacity: 0.7 },
-      ],
+      text: '',
+      x: 50,
+      frames: [],
+      keyframes: [],
     }
-    const p = await createProject('motion', 'New Motion Project', defaultData)
+    const p = await createProject('motion', 'Untitled Motion', defaultData)
     setCurrent(p)
     setName(p.name)
     setDuration(10)
-    setText('SPRING SALE ADVERT')
-    setKeyframes(defaultData.keyframes!)
+    setText('')
+    setKeyframes([])
     onNotice('New motion project created.')
   }
+
 
   const addKeyframeAtPlayhead = () => {
     const newKf: Keyframe = {
