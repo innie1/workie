@@ -1,3 +1,3 @@
-// Workie intentionally ships without demo projects or seeded user data.
-// Real projects are created by the user and persisted locally.
+// No demo or mock data is shipped with Workie.
+// This marker exists only to make the no-seed policy explicit.
 export const DEMO_DATA_DISABLED = true;
